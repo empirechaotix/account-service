@@ -1,0 +1,35 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: account-service-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "account-service.192.168.99.109.nip.io"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: account-service-gateway
+spec:
+  hosts:
+  - "account-service.192.168.99.109.nip.io"
+  gateways:
+  - account-service-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /account-service
+    rewrite:
+      uri: /
+    route:
+    - destination:
+        host: account-service
+        port:
+          number: 8080
